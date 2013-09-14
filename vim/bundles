@@ -1,0 +1,30 @@
+Bundle 'ctrlp.vim'
+Bundle 'vim-erlang/vim-erlang-runtime'
+Bundle 'myusuf3/numbers.vim'
+
+let g:ctrlp_working_path_mode = 'ra'
+let g:ctrlp_custom_ignore = {
+    \ 'dir':  '\.git$\|\.hg$\|\.svn$|\.tmp$|node_modules$',
+    \ 'file': '\.beam$\'        
+    \ }
+
+Bundle 'Shougo/vimproc', { 'build':
+        \ { 'mac' : 'make -f make_mac.mak',
+        \ 'unix' : 'make -f make_unix.mak' } }
+
+Bundle 'bling/vim-airline'
+" Vim-airline{{{
+let g:airline_powerline_fonts=1
+let g:airline_enable_branch=1
+let g:airline_theme='tomorrow'
+
+"Setting here the symbols was the only way I found to
+" show the glyphs in the statusline (got at
+" https://github.com/bling/vim-airline/issues/76?source=cc)
+let g:airline_left_sep = '⮀'
+let g:airline_left_alt_sep = '⮁'
+let g:airline_right_sep = '⮂'
+let g:airline_right_alt_sep = '⮃'
+let g:airline_branch_prefix = '⭠'
+let g:airline_readonly_symbol = '⭤'
+let g:airline_linecolumn_prefix = '⭡'        
