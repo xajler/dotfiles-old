@@ -5,6 +5,7 @@ Bundle 'tpope/vim-markdown'
 Bundle 'gkz/vim-ls'
 Bundle 'altercation/vim-colors-solarized'
 Bundle 'scrooloose/syntastic'
+Bundle 'kchmck/vim-coffee-script'
 
 let g:solarized_degrade = 1
 

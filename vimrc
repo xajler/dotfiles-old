@@ -158,6 +158,7 @@ autocmd FileType haskell,python         setlocal foldmethod=indent nofoldenable
 autocmd FileType text,markdown          setlocal textwidth=72 formatoptions+=2l colorcolumn=+1 spell
 autocmd FileType gitcommit              setlocal spell
 autocmd FileType help                   setlocal nospell
+autocmd BufWritePost *.coffee silent make!
 
 " LiveScript
 hi link lsSpaceError NONE
