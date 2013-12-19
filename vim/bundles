@@ -1,11 +1,17 @@
 Bundle 'ctrlp.vim'
 Bundle 'vim-erlang/vim-erlang-runtime'
 Bundle 'myusuf3/numbers.vim'
+Bundle 'tpope/vim-markdown'
+Bundle 'gkz/vim-ls'
+Bundle 'altercation/vim-colors-solarized'
+Bundle 'scrooloose/syntastic'
+
+let g:solarized_degrade = 1
 
 let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_custom_ignore = {
     \ 'dir':  '\.git$\|\.hg$\|\.svn$|\.tmp$|node_modules$',
-    \ 'file': '\.beam$\'        
+    \ 'file': '\.beam$\'
     \ }
 
 Bundle 'Shougo/vimproc', { 'build':
@@ -27,4 +33,11 @@ let g:airline_right_sep = '⮂'
 let g:airline_right_alt_sep = '⮃'
 let g:airline_branch_prefix = '⭠'
 let g:airline_readonly_symbol = '⭤'
-let g:airline_linecolumn_prefix = '⭡'        
+let g:airline_linecolumn_prefix = '⭡'
+
+let g:markdown_fenced_languages = ['ruby', 'sh', 'erlang']
+
+augroup markdown
+    au!
+    au BufNewFile,BufRead *.md,*.markdown setlocal filetype=markdown
+augroup END

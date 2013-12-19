@@ -25,7 +25,7 @@ scriptencoding utf-8
 set shortmess+=filmnrxoOtT  " Abbrev. of messages (avoids 'hit enter')
 set viewoptions=folds,options,cursor,unix,slash " Better Unix  compatibility
 set virtualedit=onemore     " Allow for cursor beyond last character
-set nospell                         
+set nospell
 set hidden                  " Allow buffer switching without saving
 set autoread                " Set to auto read when a file is changed from the outside
 set background=dark
@@ -39,7 +39,7 @@ set tm=500
 set history=1000            " Store a ton of history (default is 20)
 set backup                  " Backups are nice ...
 set backupdir=~/.vim/backup
-set noswapfile   
+set noswapfile
 
 if has('persistent_undo')
     set undofile                " So is persistent undo ...
@@ -48,21 +48,23 @@ if has('persistent_undo')
     set undodir=~/.vim/backup
 endif
 
-if has ('gui')   
-	set guioptions+=c
-	set guioptions-=T
-	set guioptions-=l
-	set guioptions-=r
-	set guioptions-=L
-	set guioptions-=R      
-   	set clipboard=unnamed
-   	set guifont=Menlo:h14
+if has ('gui')
+    set guioptions+=c
+    set guioptions-=T
+    set guioptions-=l
+    set guioptions-=r
+    set guioptions-=L
+    set guioptions-=R
+    set clipboard=unnamed
+    set guifont=Menlo:h14
 else
-	set term=xterm-256color
-	set t_Co=256
+    set term=xterm-256color
+    set t_Co=256
 endif
 
-color tomorrow-night
+" color tomorrow-night
+let g:solarized_termcolors = 256
+color solarized
 
 " Reduce timeout after <ESC> is recvd. This is only a good idea on fast links.
 " Got at: https://code.google.com/p/iterm2/issues/detail?id=1322
@@ -118,11 +120,10 @@ set wildmode=list:longest,full  " Command <Tab> completion, list matches, then l
 set whichwrap=b,s,h,l,<,>,[,]   " Backspace and cursor keys wrap too
 set scrolljump=5                " Lines to scroll when cursor leaves screen
 set scrolloff=3                 " Minimum lines to keep above and below cursor
-set foldenable                  " Auto fold code
 set list
 set listchars=tab:›\ ,trail:•,extends:#,nbsp:. " Highlight problematic whitespace
 set wildignore+=*.DS_Store
-set wildignore+=*.beam 
+set wildignore+=*.beam
 " ,*.so,*.pyc,*.NEF,*.xmp,*.avi,*.mp3,*.mp4,*.jpg,*.png,*.pdf,*.dmg,*.zip,*.rar,*.mkv,*.mov,*.key,*.tif
 " set wildignore+=*.dmg,*.zip,*.rar,*.mkv,*.mov,*.key,*.tif,*.psd,*.docx,*.pages,*.key,*.xlsx,*.epub,*.rdp,*.bin,*.dat,*.exe,*.dll,*.pdb
 
@@ -139,7 +140,7 @@ set splitbelow                  " Puts new split windows to the bottom of the cu
 set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
 "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
 " Remove trailing whitespaces and ^M chars
-autocmd FileType c,cpp,java,go,php,javascript,python,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
+autocmd FileType c,cpp,java,go,ruby,javascript,python,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
 autocmd FileType haskell setlocal expandtab shiftwidth=2 softtabstop=2
 autocmd BufNewFile,BufRead *.coffee set filetype=coffee
 
@@ -153,7 +154,31 @@ autocmd FileType haskell setlocal commentstring=--\ %s
 
 autocmd FileType c,cpp                  setlocal foldmethod=syntax cinoptions=(0,g0,N-s,:0,l1,t0
 autocmd FileType erlang,haskell         setlocal expandtab tabstop=4 shiftwidth=4
-autocmd FileType haskell,python         setlocal foldmethod=indent
+autocmd FileType haskell,python         setlocal foldmethod=indent nofoldenable
 autocmd FileType text,markdown          setlocal textwidth=72 formatoptions+=2l colorcolumn=+1 spell
 autocmd FileType gitcommit              setlocal spell
 autocmd FileType help                   setlocal nospell
+
+" LiveScript
+hi link lsSpaceError NONE
+hi link lsReservedError NONE
+"au BufNewFile,BufReadPost *.ls setl foldmethod=indent nofoldenable
+"au BufNewFile,BufReadPost *.ls setl shiftwidth=2 expandtab
+
+function StripTrailingWhitespace()
+  if !&binary && &filetype != 'diff'
+    normal mz
+    normal Hmy
+    %s/\s\+$//e
+    normal 'yz<CR>
+    normal `z
+  endif
+endfunction
+
+function SetForMarkdown()
+    colorscheme iawriter
+    set linespace=5
+    set background=light
+    set guifont=Cousine:h12
+    set nu!
+endfunction
