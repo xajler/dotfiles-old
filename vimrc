@@ -12,10 +12,10 @@ call vundle#rc()
 Bundle 'gmarik/vundle'
 
 " Load all the other plugins
-source ~/.vim/bundles
-let g:bundles_file ="~/.vim/bundles"
+source ~/.vim/bundles.vim
+let g:bundles_file ="~/.vim/bundles.vim"
 
-filetype plugin indent on   " Automatically detect file types.		
+filetype plugin indent on   " Automatically detect file types.
 syntax on                   " Syntax highlighting
 let mapleader=","
 set shell=/bin/zsh
@@ -62,9 +62,16 @@ else
     set t_Co=256
 endif
 
+if has("gui_macvim")
+  " Use bash for external commands on mvim.
+  " set shell = bash
+endif
+
 " color tomorrow-night
-let g:solarized_termcolors = 256
-color solarized
+" let g:solarized_termcolors = 256
+" color solarized
+let g:hybrid_use_iTerm_colors = 1
+colorscheme hybrid
 
 " Reduce timeout after <ESC> is recvd. This is only a good idea on fast links.
 " Got at: https://code.google.com/p/iterm2/issues/detail?id=1322
@@ -106,6 +113,9 @@ if has('statusline')
     set statusline+=%=%-14.(%l,%c%V%)\ %p%%  " Right aligned file nav info
 endif
 
+set complete-=i
+set nrformats-=octal
+
 set backspace=indent,eol,start  " Backspace for dummies
 set linespace=0                 " No extra spaces between rows
 set nu                          " Line numbers on
@@ -140,13 +150,17 @@ set splitbelow                  " Puts new split windows to the bottom of the cu
 set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
 "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
 " Remove trailing whitespaces and ^M chars
-autocmd FileType c,cpp,java,go,ruby,javascript,python,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
+" autocmd FileType c,cpp,java,go,ruby,javascript,python,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
 autocmd FileType haskell setlocal expandtab shiftwidth=2 softtabstop=2
 autocmd BufNewFile,BufRead *.coffee set filetype=coffee
+au BufNewFile,BufReadPost *.coffee, setlocal sw=2
+autocmd Filetype javascript setlocal ts=2 sts=2 sw=2
+
 
 " Workaround vim-commentary for Haskell
 autocmd FileType haskell setlocal commentstring=--\ %s
 
+nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
 
 " autocmd BufEnter README,TODO,BUGS       setlocal filetype=text
 " autocmd BufEnter PLAN,*.notes           setlocal filetype=notes
@@ -158,28 +172,58 @@ autocmd FileType haskell,python         setlocal foldmethod=indent nofoldenable
 autocmd FileType text,markdown          setlocal textwidth=72 formatoptions+=2l colorcolumn=+1 spell
 autocmd FileType gitcommit              setlocal spell
 autocmd FileType help                   setlocal nospell
-autocmd BufWritePost *.coffee silent make!
+autocmd BufNewFile,BufRead *.json set ft=javascript
+" au FileType javascript call JavaScriptFold()
 
-" LiveScript
-hi link lsSpaceError NONE
-hi link lsReservedError NONE
-"au BufNewFile,BufReadPost *.ls setl foldmethod=indent nofoldenable
-"au BufNewFile,BufReadPost *.ls setl shiftwidth=2 expandtab
+" Vim-airline
+let g:airline_powerline_fonts=1
+let g:airline_enable_branch=1
+let g:airline_theme='dark'
 
-function StripTrailingWhitespace()
-  if !&binary && &filetype != 'diff'
-    normal mz
-    normal Hmy
-    %s/\s\+$//e
-    normal 'yz<CR>
-    normal `z
+map <Leader>t :call RunCurrentSpecFile()<CR>
+map <Leader>s :call RunNearestSpec()<CR>
+map <Leader>l :call RunLastSpec()<CR>
+map <Leader>a :call RunAllSpecs()<CR>
+
+if &term =~ '^xterm'
+  " solid underscore
+  let &t_SI .= "\<Esc>[4 q"
+  " solid block
+  let &t_EI .= "\<Esc>[2 q"
+  " 1 or 0 -> blinking block
+  " 3 -> blinking underscore
+  " Recent versions of xterm (282 or above) also support
+  " 5 -> blinking vertical bar
+  " 6 -> solid vertical bar
+endif
+
+function! OpenTestAlternate()
+  let new_file = AlternateForCurrentFile()
+  exec ':e ' . new_file
+endfunction
+
+function! AlternateForCurrentFile()
+  let current_file = expand("%")
+  let new_file = current_file
+  let in_test = match(current_file, '^test/server/') != -1
+  let going_to_test = !in_test
+  let in_app = match(current_file, '\<api\>') != -1 || match(current_file, '\<factories\>') != -1  || match(current_file, '\<commands\>') != -1
+
+  if going_to_test
+    if in_app
+      let new_file = substitute(new_file, '^app/', '', '')
+    end
+    let new_file = substitute(new_file, '\.e\?js$', '_test.js', '')
+    let new_file = 'test/server/' . new_file
+  else
+    let new_file = substitute(new_file, '_test\.js$', '.js', '')
+    let new_file = substitute(new_file, '^test/server/','', '')
+    if in_app
+      let new_file = 'app/' . new_file
+    end
   endif
+  return new_file
 endfunction
+nnoremap <leader>. :call OpenTestAlternate()<cr>
 
-function SetForMarkdown()
-    colorscheme iawriter
-    set linespace=5
-    set background=light
-    set guifont=Cousine:h12
-    set nu!
-endfunction
+let g:mocha_js_command = "!clear; NODE_ENV='test' /Users/xajler/src/qualtrak/qcoach/node_modules/mocha/bin/mocha {spec} --harmony --require co-mocha --bail"
